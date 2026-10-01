@@ -1,0 +1,12 @@
+trabalhoPOO\model\Usuario.class
+trabalhoPOO\repository\PartidaRepository.class
+trabalhoPOO\controller\HomeController.class
+trabalhoPOO\controller\CadastroController.class
+trabalhoPOO\model\LocalStarWars.class
+trabalhoPOO\model\LocalDataInitializer.class
+trabalhoPOO\model\Partida.class
+trabalhoPOO\repository\UsuarioRepository.class
+trabalhoPOO\DemoApplication.class
+trabalhoPOO\controller\LoginController.class
+trabalhoPOO\controller\JogoController.class
+trabalhoPOO\repository\LocalRepository.class

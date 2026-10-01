@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Star Wars Quiz - O Desafio da Galáxia</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<canvas id="starfield"></canvas>
+<main class="main-container">
+    <header class="header">
+        <th:block th:if="${pagina == 'inicio'}">
+            <h1 class="sw-title">STAR WARS</h1>
+            <h2 class="sw-subtitle">QUIZ DE LOCALIDADES</h2>
+        </th:block>
+        <th:block th:unless="${pagina == 'inicio'}">
+            <a class="home-link" href="/">STAR WARS</a>
+            <h1 class="sw-subtitle" th:if="${pagina == 'login'}">Entrar</h1>
+            <h1 class="sw-subtitle" th:if="${pagina == 'cadastro'}">Criar conta</h1>
+            <h1 class="sw-subtitle" th:if="${pagina == 'jogo'}">Quiz de localidades</h1>
+            <h1 class="sw-subtitle" th:if="${pagina == 'resultadoRodada'}">Resultado da rodada</h1>
+            <h1 class="sw-subtitle" th:if="${pagina == 'resultado'}">Missão concluída</h1>
+        </th:block>
+    </header>
+
+    <section class="card hero-card" th:if="${pagina == 'inicio'}">
+        <p class="welcome-text">Teste seus conhecimentos sobre as localidades, planetas e bases da galáxia muito, muito distante!</p>
+        <div class="rules-container">
+            <h3>Como funciona:</h3>
+            <ul>
+                <li><span class="highlight">10 Rodadas</span> por partida</li>
+                <li><span class="highlight">10 Pontos</span> por cada acerto</li>
+                <li>Identifique o local correto através da imagem ou descrição</li>
+            </ul>
+        </div>
+        <div class="action-buttons">
+            <a href="/login" class="btn btn-primary">Entrar / Jogar</a>
+            <a href="/cadastro" class="btn btn-secondary">Criar Conta</a>
+        </div>
+    </section>
+
+    <section class="card form-card" th:if="${pagina == 'login'}">
+        <p class="welcome-text">Acesse sua conta para continuar a missão.</p>
+        <p class="form-error" th:if="${erro}" th:text="${erro}" role="alert"></p>
+        <form class="form-stack" action="/login" method="post">
+            <label for="email">E-mail</label>
+            <input id="email" name="email" type="email" autocomplete="email" required>
+            <label for="senha">Senha</label>
+            <input id="senha" name="senha" type="password" autocomplete="current-password" required>
+            <button class="btn btn-primary" type="submit">Entrar</button>
+        </form>
+        <p class="form-switch">Ainda não tem conta? <a href="/cadastro">Criar conta</a></p>
+    </section>
+
+    <section class="card form-card" th:if="${pagina == 'cadastro'}">
+        <p class="welcome-text">Prepare-se para testar seus conhecimentos pela galáxia.</p>
+        <p class="form-error" th:if="${erro}" th:text="${erro}" role="alert"></p>
+        <form class="form-stack" action="/cadastro" method="post">
+            <label for="nome">Nome</label>
+            <input id="nome" name="nome" type="text" autocomplete="name" required>
+            <label for="email">E-mail</label>
+            <input id="email" name="email" type="email" autocomplete="email" required>
+            <label for="senha">Senha</label>
+            <input id="senha" name="senha" type="password" autocomplete="new-password" minlength="4" required>
+            <button class="btn btn-primary" type="submit">Criar conta</button>
+        </form>
+        <p class="form-switch">Já tem conta? <a href="/login">Entrar</a></p>
+    </section>
+
+    <section class="card game-card" th:if="${pagina == 'jogo'}">
+        <div class="game-meta">
+            <span>Rodada <strong th:text="${rodada}">1</strong> / <span th:text="${totalRodadas}">10</span></span>
+            <span>Pontuação <strong th:text="${pontuacao}">0</strong></span>
+        </div>
+        <p class="welcome-text">Qual local da galáxia corresponde à descrição?</p>
+        <div class="location-prompt" th:if="${local != null}">
+            <img class="location-image" th:if="${local.imagem != null and !#strings.isEmpty(local.imagem)}" th:src="${local.imagem}" th:alt="|Imagem de ${local.tipo}|">
+            <p class="location-type" th:text="${local.tipo}">Planeta</p>
+            <p class="location-description" th:text="${local.descricao}">Descrição do local.</p>
+        </div>
+        <p class="form-error" th:if="${local == null}" role="alert">Não há locais cadastrados para esta partida.</p>
+        <form class="form-stack" action="/jogo/responder" method="post" th:if="${local != null}">
+            <label for="resposta">Nome do local</label>
+            <input id="resposta" name="resposta" type="text" autocomplete="off" required autofocus>
+            <button class="btn btn-primary" type="submit">Responder</button>
+        </form>
+        <a class="text-link" href="/logout">Sair</a>
+    </section>
+
+    <section class="card result-card" th:if="${pagina == 'resultadoRodada'}">
+        <p class="result-status" th:classappend="${acertou} ? ' is-correct' : ' is-incorrect'" th:text="${acertou} ? 'Resposta correta!' : 'Não foi dessa vez.'">Resultado</p>
+        <p class="welcome-text" th:if="${!acertou and respostaCorreta != null}">A resposta era <strong th:text="${respostaCorreta}">local</strong>.</p>
+        <p class="score-line">Pontuação: <strong th:text="${pontuacao}">0</strong></p>
+        <a class="btn btn-primary" href="/jogo">Próxima rodada</a>
+    </section>
+
+    <section class="card result-card" th:if="${pagina == 'resultado'}">
+        <p class="welcome-text">Muito bem, <strong th:text="${usuario.nome}">jogador</strong>. Sua pontuação final:</p>
+        <p class="final-score" th:text="${pontuacao}">0</p>
+        <div class="action-buttons">
+            <a class="btn btn-primary" href="/jogo/novo">Jogar novamente</a>
+            <a class="btn btn-secondary" href="/logout">Sair</a>
+        </div>
+    </section>
+
+    <footer class="footer" th:if="${pagina == 'inicio'}">
+        <p>&copy; 2026 Trabalho POO - Que a Força esteja com você.</p>
+    </footer>
+</main>
+<script src="/script.js"></script>
+</body>
+</html>
